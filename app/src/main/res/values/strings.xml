@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">MovieFlix</string>
+
+    <!-- Network Errors -->
+    <string name="error_network">Network error. Please check your internet connection and try again.</string>
+    <string name="error_not_found">Resource not found. Please try again later.</string>
+    <string name="error_not_authorized">Not authorized. Please log in and try again.</string>
+    <string name="error_service_unavailable">Service temporarily unavailable. Please try again later.</string>
+    <string name="error_service_not_working">Service is not working. Please try again later.</string>
+    <string name="error_unknown">An unknown error occurred. Please try again later.</string>
+    <string name="error_no_results">No results found. Please try again later.</string>
+
+</resources>
