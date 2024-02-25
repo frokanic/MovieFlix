@@ -13,17 +13,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,6 +42,14 @@ import com.projects.movieflix.presentation.screen.moviedetails.components.Detail
 import com.projects.movieflix.presentation.screen.moviedetails.components.ErrorInfo
 import com.projects.movieflix.presentation.screen.moviedetails.components.MovieInfo
 import com.projects.movieflix.utils.extensionfunctions.toJson
+import dev.materii.pullrefresh.rememberPullRefreshState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import dev.materii.pullrefresh.DragRefreshIndicator
+import dev.materii.pullrefresh.DragRefreshLayout
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +59,24 @@ fun MovieDetailsScreen(
 ) {
     val context = LocalContext.current
     val state = viewModel.movieDetailsState.collectAsState().value
+
+    var isRefreshing by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = isRefreshing,
+        onRefresh = {
+            scope.launch {
+                isRefreshing = true
+                viewModel.movieId?.let {
+                    viewModel.fetchMovieDetails(it)
+                }
+                delay(3000)
+                isRefreshing = false
+            }
+
+        }
+    )
 
     Column(modifier = Modifier.fillMaxSize()) {
         DetailsTopBar(
@@ -71,14 +99,27 @@ fun MovieDetailsScreen(
                 }
             }
             state.error != null -> {
-                val refreshState = rememberPullToRefreshState()
-
-                ErrorInfo(state.error)
-
-                PullToRefreshContainer(
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    state = refreshState
-                )
+                DragRefreshLayout(
+                    modifier = Modifier.fillMaxSize(),
+                    state = pullRefreshState,
+                    flipped = false,
+                    indicator = {
+                        DragRefreshIndicator(
+                            state = pullRefreshState,
+                            flipped = false,
+                            color = Color.White
+                        )
+                    }
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState()),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ErrorInfo(state.error)
+                    }
+                }
             }
             state.movieDetails != null -> {
                 Column(

@@ -37,12 +37,15 @@ interface MovieDao {
     @Query("SELECT COUNT(*) FROM movies")
     suspend fun getNumberOfEntities(): Int
 
-    @Query("UPDATE movies SET isFavorite = NOT isFavorite WHERE id = :movieId")
-    suspend fun addRemoveFavorites(movieId: Int)
-
     @Query("SELECT isFavorite FROM movies WHERE id = :movieId")
     suspend fun isFavorite(movieId: Int): Boolean
 
     @Query("SELECT id FROM movies WHERE isFavorite = 1")
     suspend fun getFavorites(): List<Int>
+
+    @Query("SELECT COUNT(id) FROM movies WHERE id = :movieId")
+    suspend fun getCountById(movieId: Int): Int
+
+    @Query("UPDATE movies SET isFavorite = NOT isFavorite WHERE id = :movieId")
+    suspend fun addRemoveFavorites(movieId: Int)
 }

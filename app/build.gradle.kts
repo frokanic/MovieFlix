@@ -64,7 +64,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
-//    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.2")
     implementation("androidx.compose.material3:material3-android:1.2.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -73,9 +73,6 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-
-
-    implementation("androidx.compose.runtime:runtime-livedata:1.6.2")
 
     implementation("androidx.core:core-splashscreen:1.0.1")
 
@@ -90,10 +87,6 @@ dependencies {
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-
-    // Glide
-//    implementation("com.github.bumptech.glide:glide:4.16.0")
-//    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 
     // Coil
     implementation("io.coil-kt:coil-compose:2.5.0")
@@ -110,10 +103,8 @@ dependencies {
     // Extended Icons
     implementation("androidx.compose.material:material-icons-extended:1.6.1")
 
-    // Paging 3
-    implementation("androidx.paging:paging-runtime-ktx:3.2.1")
-    implementation("androidx.paging:paging-compose:3.3.0-alpha03")
-
     // Gson
     implementation("com.google.code.gson:gson:2.10")
+
+    implementation("dev.materii.pullrefresh:pullrefresh:1.3.0")
 }

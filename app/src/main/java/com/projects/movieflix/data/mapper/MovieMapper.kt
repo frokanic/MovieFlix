@@ -21,6 +21,16 @@ fun Result.toMovieEntity(page: Int, isFavorite: Boolean = false): MovieEntity = 
     isFavorite = isFavorite
 )
 
+fun MovieDetailsResponse.toMovieEntity(): MovieEntity = MovieEntity(
+    id = this.id,
+    title = this.title,
+    rating = this.vote_average,
+    imageUrl = "https://image.tmdb.org/t/p/w500${this.backdrop_path}",
+    releaseDate = this.release_date.reformatDate("yyyy-MM-dd", "dd MMMM yyyy"),
+    page = -1,
+    isFavorite = false
+)
+
 fun MovieEntity.toDomainModel(imageFromLocal: Bitmap? = null): Movie {
     return Movie(
         id = this.id,
