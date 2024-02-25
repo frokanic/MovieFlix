@@ -11,7 +11,7 @@ import com.projects.movieflix.domain.local.PhotoStorageManager
 import com.projects.movieflix.domain.repository.MovieRepository
 import com.projects.movieflix.domain.usecase.GetAllMoviesUseCase
 import com.projects.movieflix.domain.usecase.GetMovieDetailsUseCase
-import com.projects.movieflix.domain.usecase.UpdateFavoriteStatusUseCase
+import com.projects.movieflix.domain.usecase.FavoriteStatusUseCase
 //import com.projects.movieflix.domain.usecase.GetAllMoviesUseCase
 //import com.projects.movieflix.domain.usecase.GetMovieDetailsUseCase
 import dagger.Module
@@ -49,6 +49,6 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideUpdateFavoriteStatusUseCase(repository: MovieRepository): UpdateFavoriteStatusUseCase =
-        UpdateFavoriteStatusUseCase(repository)
+    fun provideUpdateFavoriteStatusUseCase(repository: MovieRepository): FavoriteStatusUseCase =
+        FavoriteStatusUseCase(repository)
 }

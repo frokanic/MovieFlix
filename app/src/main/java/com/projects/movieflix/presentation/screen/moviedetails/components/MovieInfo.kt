@@ -1,6 +1,7 @@
 package com.projects.movieflix.presentation.screen.moviedetails.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,7 +31,7 @@ fun MovieInfo(
     reviews: List<Review>,
     similarMovies: List<Movie>,
     modifier: Modifier = Modifier,
-    onSimilarMoviePressed: (Boolean) -> Unit
+    onSimilarMoviePressed: (Int) -> Unit
 ) {
     Column(modifier = modifier
         .padding(horizontal = 16.dp)
@@ -108,10 +109,16 @@ fun MovieInfo(
             items(similarMovies.size) { index ->
                 // Get the movie from the list using the index
                 val movie = similarMovies[index]
+
                 Image(
                     painter = rememberAsyncImagePainter(model = movie.imageUrl),
                     contentDescription = movie.title,
-                    modifier = Modifier.size(120.dp, 180.dp).padding(end = 8.dp)
+                    modifier = Modifier
+                        .size(120.dp, 180.dp)
+                        .padding(end = 8.dp)
+                        .clickable {
+                            onSimilarMoviePressed(movie.id)
+                        }
                 )
             }
         }

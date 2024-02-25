@@ -74,6 +74,9 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
+
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.2")
+
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     // Compose Navigation
@@ -111,7 +114,6 @@ dependencies {
     implementation("androidx.paging:paging-runtime-ktx:3.2.1")
     implementation("androidx.paging:paging-compose:3.3.0-alpha03")
 
-    // Swipe to refresh
-    implementation("com.google.accompanist:accompanist-swiperefresh:0.34.0")
-    implementation("com.google.accompanist:accompanist-flowlayout:0.34.0")
+    // Gson
+    implementation("com.google.code.gson:gson:2.10")
 }

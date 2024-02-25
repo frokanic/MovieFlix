@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.projects.movieflix.domain.usecase.GetAllMoviesUseCase
-import com.projects.movieflix.domain.usecase.UpdateFavoriteStatusUseCase
+import com.projects.movieflix.domain.usecase.FavoriteStatusUseCase
 import com.projects.movieflix.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AllMoviesViewModel @Inject constructor(
     private val getAllMoviesUseCase: GetAllMoviesUseCase,
-    private val updateFavoriteStatusUseCase: UpdateFavoriteStatusUseCase
+    private val favoriteStatusUseCase: FavoriteStatusUseCase
 ) : ViewModel() {
 
     var curPage = 1
@@ -76,13 +76,34 @@ class AllMoviesViewModel @Inject constructor(
 
     fun updateFavorite(movieId: Int) {
         viewModelScope.launch {
-            // Optimistic UI update
             val updatedMovies = _screenState.value.movies.map { movie ->
                 if (movie.id == movieId) movie.copy(isFavorite = !movie.isFavorite) else movie
             }
             _screenState.value = _screenState.value.copy(movies = updatedMovies)
 
-            updateFavoriteStatusUseCase(movieId)
+            favoriteStatusUseCase.addRemoveFavorites(movieId)
         }
     }
+
+    fun refreshFavoriteStatuses() {
+        viewModelScope.launch {
+            val favoriteIdsFromDb = favoriteStatusUseCase.getFavorites().toSet()
+            val favoriteIdsInUi = _screenState.value.movies.filter { it.isFavorite }.map { it.id }.toSet()
+
+            if (favoriteIdsFromDb == favoriteIdsInUi) return@launch
+
+            val updatedMovies = _screenState.value.movies.map { movie ->
+                if (movie.id in favoriteIdsFromDb && !movie.isFavorite) {
+                    movie.copy(isFavorite = true)
+                } else if (movie.id !in favoriteIdsFromDb && movie.isFavorite) {
+                    movie.copy(isFavorite = false)
+                } else {
+                    movie
+                }
+            }
+
+            _screenState.value = _screenState.value.copy(movies = updatedMovies)
+        }
+    }
+
 }

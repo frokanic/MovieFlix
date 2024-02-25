@@ -16,7 +16,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -61,41 +63,43 @@ class MovieRepositoryImpl @Inject constructor(
                      }
                  }
 
-                 val movies = database.dao.getMoviesByPage(page).map { it.toDomainModel() }
-                 emit(Resource.Success(movies))
+                 emitAll(database.dao.getMoviesByPage(page).map { entities ->
+                     Resource.Success(entities.map { it.toDomainModel() })
+                 })
              } catch (e: Exception) {
                  val fallbackResult = database.dao.getMoviesByPage(1)
                  val cachedPhotos = photoStorage.loadPhotos()
 
-                 val moviesWithPhotos = fallbackResult.mapNotNull { movieEntity ->
-                     val photo = cachedPhotos.find { it.filename.startsWith("${movieEntity.id}.jpg") }
-                     if (photo != null) {
-                         Movie(
-                             id = movieEntity.id,
-                             title = movieEntity.title ?: "Unknown",
-                             rating = movieEntity.rating ?: 0.0,
-                             imageUrl = movieEntity.imageUrl ?: "",
-                             releaseDate = movieEntity.releaseDate ?: "Unknown",
-                             page = movieEntity.page,
-                             imageFromLocal = photo.bitmap,
-                             isFavorite = movieEntity.isFavorite
-                         )
-                     } else {
-                         null
+                 emitAll(fallbackResult
+                     .map { entities ->
+                         val moviesWithPhotos = entities.mapNotNull { movieEntity ->
+                             val photo = cachedPhotos.find { it.filename.startsWith("${movieEntity.id}.jpg") }
+                             photo?.let {
+                                 Movie(
+                                     id = movieEntity.id,
+                                     title = movieEntity.title ?: "Unknown",
+                                     rating = movieEntity.rating ?: 0.0,
+                                     imageUrl = movieEntity.imageUrl ?: "",
+                                     releaseDate = movieEntity.releaseDate ?: "Unknown",
+                                     page = movieEntity.page,
+                                     imageFromLocal = photo.bitmap,
+                                     isFavorite = movieEntity.isFavorite
+                                 )
+                             }
+                         }
+                         if (moviesWithPhotos.isNotEmpty()) {
+                             Resource.Success(moviesWithPhotos, errorMapper.mapError(e))
+                         } else {
+                             Resource.Error(errorMapper.mapError(e))
+                         }
                      }
-                 }
-
-                 if (moviesWithPhotos.isNotEmpty()) {
-                     emit(Resource.Success(moviesWithPhotos, errorMapper.mapError(e)))
-                 } else {
-                     emit(Resource.Error(errorMapper.mapError(e)))
-                 }
+                 )
              }
          } else {
              try {
-                 val movies = database.dao.getMoviesByPage(page).map { it.toDomainModel() }
-
-                 emit(Resource.Success(movies))
+                 emitAll(database.dao.getMoviesByPage(page).map { entities ->
+                     Resource.Success(entities.map { it.toDomainModel() })
+                 })
              } catch(e: Exception) {
                  getMovies(page, true)
              }
@@ -128,4 +132,6 @@ class MovieRepositoryImpl @Inject constructor(
             emit(Resource.Error(errorMapper.mapError(e)))
         }
     }
+
+    override suspend fun getFavorites(): List<Int> = database.dao.getFavorites()
 }

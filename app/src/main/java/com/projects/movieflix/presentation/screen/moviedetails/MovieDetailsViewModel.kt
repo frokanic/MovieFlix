@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.projects.movieflix.domain.usecase.GetMovieDetailsUseCase
-import com.projects.movieflix.domain.usecase.UpdateFavoriteStatusUseCase
+import com.projects.movieflix.domain.usecase.FavoriteStatusUseCase
 import com.projects.movieflix.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MovieDetailsViewModel @Inject constructor(
     private val getMovieDetailsUseCase: GetMovieDetailsUseCase,
-    private val updateFavoriteStatusUseCase: UpdateFavoriteStatusUseCase,
+    private val favoriteStatusUseCase: FavoriteStatusUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -63,7 +63,7 @@ class MovieDetailsViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
-            updateFavoriteStatusUseCase(movieId)
+            favoriteStatusUseCase.addRemoveFavorites(movieId)
         }
     }
 }

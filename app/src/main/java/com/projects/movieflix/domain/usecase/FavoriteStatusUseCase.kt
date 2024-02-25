@@ -3,8 +3,10 @@ package com.projects.movieflix.domain.usecase
 import com.projects.movieflix.domain.repository.MovieRepository
 import javax.inject.Inject
 
-class UpdateFavoriteStatusUseCase@Inject constructor(
+class FavoriteStatusUseCase@Inject constructor(
     private val repository: MovieRepository
 ) {
-    suspend operator fun invoke(id: Int) = repository.addRemoveFavorites(id)
+    suspend fun addRemoveFavorites(id: Int) = repository.addRemoveFavorites(id)
+
+    suspend fun getFavorites() = repository.getFavorites()
 }
