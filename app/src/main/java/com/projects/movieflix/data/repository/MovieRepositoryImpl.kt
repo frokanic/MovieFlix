@@ -118,15 +118,23 @@ class MovieRepositoryImpl @Inject constructor(
                 val detailsDeferred = async { api.getMovieDetails(id) }
                 val reviewsDeferred = async { api.getMovieReviews(id, 1) }
                 val similarMoviesDeferred = async { api.getSimilarMovies(id, 1) }
+                val isInDbDeferred = async { database.dao.getCountById(id) }
                 val isFavoriteDeferred = async { database.dao.isFavorite(id) }
 
                 val details = detailsDeferred.await()
                 val reviews = reviewsDeferred.await()
                 val similarMovies = similarMoviesDeferred.await()
+                val isInDb = isInDbDeferred.await() > 0
                 val isFavorite = isFavoriteDeferred.await()
 
                 val movieDetails = detailsToDomainModel(details, reviews, similarMovies, isFavorite)
                 emit(Resource.Success(movieDetails))
+
+                if (!isInDb) {
+                    database.dao.insertMovie(
+                        details.toMovieEntity()
+                    )
+                }
             }
         } catch (e: Exception) {
             emit(Resource.Error(errorMapper.mapError(e)))
